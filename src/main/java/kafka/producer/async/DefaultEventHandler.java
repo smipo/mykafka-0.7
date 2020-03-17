@@ -29,8 +29,10 @@ public class DefaultEventHandler<T> implements  EventHandler<T>{
 
     public void handle(QueueItem<T>[] events, SyncProducer syncProducer, Encoder<T> serializer)  throws Exception{
         QueueItem<T>[] processedEvents = events;
-        if(cbkHandler != null)
-            processedEvents = cbkHandler.beforeSendingData(events);
+        if(cbkHandler != null) {
+            List<QueueItem<T>> queueItemList = cbkHandler.beforeSendingData(events);
+            processedEvents = (QueueItem<T>[])queueItemList.toArray();
+        }
 
         send(serialize(collate(processedEvents), serializer), syncProducer);
     }

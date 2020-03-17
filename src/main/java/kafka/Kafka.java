@@ -21,7 +21,7 @@ public class Kafka {
             Properties props = Utils.loadProps(args[0]);
             KafkaConfig serverConfig = new KafkaConfig(props);
 
-            KafkaServerStartable kafkaServerStartble = new KafkaServerStartable(serverConfig);
+            final KafkaServerStartable kafkaServerStartble = new KafkaServerStartable(serverConfig);
 
             // attach shutdown handler to catch control-c
             Runtime.getRuntime().addShutdownHook(new Thread() {
