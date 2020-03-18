@@ -25,17 +25,17 @@ public class StaticTopicCount extends TopicCount{
      */
     public  String dbString(){
         StringBuilder builder = new StringBuilder();
-        builder.append("{ ");
+        builder.append("{");
         int i = 0;
         for (Map.Entry<String, Integer> entry : topicCountMap.entrySet()) {
             String topic = entry.getKey();
             Integer nConsumers = entry.getValue();
             if (i > 0)
                 builder.append(",");
-            builder.append( topic + ":" + nConsumers);
+            builder.append("\""+topic+"\"" + ":" + nConsumers);
             i += 1;
         }
-        builder.append(" }");
+        builder.append("}");
         return builder.toString();
     }
 

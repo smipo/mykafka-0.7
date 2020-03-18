@@ -13,6 +13,7 @@ import org.apache.log4j.Logger;
 import org.apache.zookeeper.Watcher;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 public class ZKBrokerPartitionInfo implements BrokerPartitionInfo{
@@ -45,6 +46,8 @@ public class ZKBrokerPartitionInfo implements BrokerPartitionInfo{
 
         // register listener for session expired event
         zkClient.subscribeStateChanges(new ZKSessionExpirationListener(brokerTopicsListener));
+
+        brokerTopicsListener = new BrokerTopicsListener(topicBrokerPartitions, allBrokers);
     }
 
     private Object zkWatcherLock = new Object();
@@ -55,7 +58,7 @@ public class ZKBrokerPartitionInfo implements BrokerPartitionInfo{
     private  Map<Integer, Broker> allBrokers ;
 
     // use just the brokerTopicsListener for all watchers
-    private BrokerTopicsListener brokerTopicsListener = new BrokerTopicsListener(topicBrokerPartitions, allBrokers);
+    private BrokerTopicsListener brokerTopicsListener ;
 
 
 
@@ -213,8 +216,8 @@ public class ZKBrokerPartitionInfo implements BrokerPartitionInfo{
         Map<Integer, Broker> originalBrokerIdMap;
 
 
-        private Map<String, SortedSet<Partition>> oldBrokerTopicPartitionsMap;
-        private Map<Integer, Broker> oldBrokerIdMap;
+        private Map<String, SortedSet<Partition>> oldBrokerTopicPartitionsMap = new ConcurrentHashMap<>();
+        private Map<Integer, Broker> oldBrokerIdMap  = new ConcurrentHashMap<>();
 
         public BrokerTopicsListener(Map<String, SortedSet<Partition>> originalBrokerTopicsPartitionsMap,
                                     Map<Integer, Broker> originalBrokerIdMap) {

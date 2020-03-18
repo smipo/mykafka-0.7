@@ -1,6 +1,6 @@
 package kafka.consumer;
 
-import com.google.gson.Gson;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import kafka.utils.ZkUtils;
 import org.I0Itec.zkclient.ZkClient;
 import org.apache.log4j.Logger;
@@ -19,7 +19,7 @@ public class TopicCountFactory {
 
     private static Logger logger = Logger.getLogger(TopicCountFactory.class);
 
-    private static Gson gson = new Gson();
+    private static ObjectMapper mapper = new ObjectMapper();
 
     public static TopicCount  constructTopicCount(String group,
                                                   String  consumerId,
@@ -50,11 +50,11 @@ public class TopicCountFactory {
             Map<String, Integer> topMap  = new HashMap<>();
             try {
                 if(topicCountString == null || topicCountString.isEmpty()) throw new RuntimeException("error constructing TopicCount : " + topicCountString);
-                topMap = gson.fromJson(topicCountString,Map.class);
+                topMap = mapper.readValue(topicCountString, Map.class);
             }
             catch (Exception e){
                 logger.error("error parsing consumer json string " + topicCountString, e);
-                throw e;
+                throw new RuntimeException(e.getMessage());
             }
            return new StaticTopicCount(consumerId, topMap);
         }

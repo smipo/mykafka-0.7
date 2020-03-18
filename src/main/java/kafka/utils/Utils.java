@@ -146,13 +146,13 @@ public class Utils {
     }
     public static int getInt(Properties props,String name, int defaultValue){
         if(props.containsKey(name))
-            return Integer.parseInt(props.getProperty(name));
+            return Integer.parseInt(props.get(name).toString());
         return defaultValue;
     }
     public static int getIntInRange(Properties props,String name, int defaultValue, int start,int end){
         int v = -1;
         if(props.containsKey(name))
-            v = Integer.parseInt(props.getProperty(name));
+            v = Integer.parseInt(props.get(name).toString());
         else
             v = defaultValue;
 
@@ -179,7 +179,7 @@ public class Utils {
     public static long getLongInRange(Properties props,String name, long defaultValue, long start,long end) {
         long v = -1;
         if(props.containsKey(name))
-            v = Long.parseLong(props.getProperty(name));
+            v = Long.parseLong(props.get(name).toString());
         else
             v = defaultValue;
 
@@ -192,7 +192,7 @@ public class Utils {
      */
     public static String getString(Properties props,String name, String defaultValue) {
         if(props.containsKey(name))
-            return props.getProperty(name);
+            return props.get(name).toString();
         return defaultValue;
     }
 
@@ -201,7 +201,7 @@ public class Utils {
      */
     public static String getString(Properties props,String name) {
         if(props.containsKey(name))
-            return  props.getProperty(name);
+            return  props.get(name).toString();
         else
             throw new IllegalArgumentException("Missing required property '" + name + "'");
     }
@@ -216,9 +216,9 @@ public class Utils {
     public static boolean getBoolean(Properties props,String name,boolean defaultValue) {
         if(!props.containsKey(name))
             return defaultValue;
-        else if("true".equals(props.getProperty(name)))
+        else if("true".equals(props.get(name) == null?null:props.get(name).toString()))
             return true;
-        else if("false".equals(props.getProperty(name)))
+        else if("false".equals(props.get(name) == null?null:props.get(name).toString()))
             return false;
         else
             throw new IllegalArgumentException("Unacceptable value for property '" + name + "', boolean values must be either 'true' or 'false" );
@@ -340,11 +340,11 @@ public class Utils {
     }
 
     public static CompressionCodec getCompressionCodec(Properties props, String codec) {
-        String codecValueString = props.getProperty(codec);
+        Object codecValueString = props.get(codec);
         if(codecValueString == null)
            return new NoCompressionCodec();
         else
-            return CompressionFactory.getCompressionCodec(Integer.parseInt(codecValueString));
+            return CompressionFactory.getCompressionCodec(Integer.parseInt(codecValueString.toString()));
     }
 
     public static List<String> getCSVList(String csvList) {
@@ -365,7 +365,7 @@ public class Utils {
      */
     public static  Properties getProps(Properties props, String name) {
         if(props.containsKey(name)) {
-            String propString = props.getProperty(name);
+            String propString = props.get(name).toString();
             String[] propValues = propString.split(",");
             Properties properties = new Properties();
             for(int i = 0;i < propValues.length;i++) {
@@ -385,7 +385,7 @@ public class Utils {
      */
     public static  Properties getProps(Properties props, String name, Properties defaultProperties){
         if(props.containsKey(name)) {
-            String propString = props.getProperty(name);
+            String propString = props.get(name).toString();
             String[] propValues = propString.split(",");
             if(propValues.length < 1)
                 throw new IllegalArgumentException("Illegal format of specifying properties '" + propString + "'");
