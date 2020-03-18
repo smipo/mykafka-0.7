@@ -216,9 +216,9 @@ public class Utils {
     public static boolean getBoolean(Properties props,String name,boolean defaultValue) {
         if(!props.containsKey(name))
             return defaultValue;
-        else if("true" == props.getProperty(name))
+        else if("true".equals(props.getProperty(name)))
             return true;
-        else if("false" == props.getProperty(name))
+        else if("false".equals(props.getProperty(name)))
             return false;
         else
             throw new IllegalArgumentException("Unacceptable value for property '" + name + "', boolean values must be either 'true' or 'false" );

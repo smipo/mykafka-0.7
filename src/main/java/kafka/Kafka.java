@@ -39,7 +39,7 @@ public class Kafka {
             kafkaServerStartble.awaitShutdown();
         }
         catch (Exception e){
-           logger.fatal(e);
+           logger.error("Kafka start Error:",e);
         }
         System.exit(0);
     }

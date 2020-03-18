@@ -43,6 +43,7 @@ public class LogManager {
         this.logCleanupDefaultAgeMs = logCleanupDefaultAgeMs;
         this.needRecovery = needRecovery;
 
+        logDir = new File(config.logDir);
         numPartitions = config.numPartitions;
         logFileSizeMap = config.logFileSizeMap;
         flushInterval = config.flushInterval;
@@ -52,7 +53,7 @@ public class LogManager {
         logRetentionSizeMap = config.logRetentionSizeMap;
         logRetentionMsMap = getMsMap(config.logRetentionHoursMap);
         logRollMsMap = getMsMap(config.logRollHoursMap);
-
+        topicNameValidator = new TopicNameValidator(config);
         if(!logDir.exists()) {
             logger.info("No log directory found, creating '" + logDir.getAbsolutePath() + "'");
             logDir.mkdirs();
@@ -107,7 +108,7 @@ public class LogManager {
     }
 
 
-    File logDir = new File(config.logDir);
+    File logDir;
     private int numPartitions ;
     private Map<String,Integer> logFileSizeMap ;
     private int flushInterval;
@@ -117,7 +118,7 @@ public class LogManager {
     private KafkaZooKeeper kafkaZookeeper = null;
     private CountDownLatch startupLatch = null;
     private KafkaScheduler logFlusherScheduler = new KafkaScheduler(1, "kafka-logflusher-", false);
-    private TopicNameValidator topicNameValidator = new TopicNameValidator(config);
+    private TopicNameValidator topicNameValidator;
     private Map<String,Integer> logFlushIntervalMap;
     private Map<String,Integer> logRetentionSizeMap ;
     private Map<String, Long>  logRetentionMsMap;

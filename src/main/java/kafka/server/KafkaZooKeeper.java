@@ -36,9 +36,11 @@ public class KafkaZooKeeper {
                            LogManager logManager){
         this.config = config;
         this.logManager = logManager;
+
+        brokerIdPath = ZkUtils.BrokerIdsPath + "/" + config.brokerId;
     }
 
-    String brokerIdPath = ZkUtils.BrokerIdsPath + "/" + config.brokerId;
+    String brokerIdPath ;
     ZkClient zkClient = null;
     List<String> topics = new ArrayList<>();
     Object lock = new Object();

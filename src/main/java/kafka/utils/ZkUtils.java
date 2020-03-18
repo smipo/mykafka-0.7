@@ -235,19 +235,23 @@ public class ZkUtils {
 
         public ZKConfig(Properties props){
             this.props = props;
+            zkConnect = Utils.getString(props, "zk.connect", null);
+            zkSessionTimeoutMs = Utils.getInt(props, "zk.sessiontimeout.ms", 6000);
+            zkConnectionTimeoutMs = Utils.getInt(props, "zk.connectiontimeout.ms",zkSessionTimeoutMs);
+            zkSyncTimeMs = Utils.getInt(props, "zk.synctime.ms", 2000);
         }
 
         /** ZK host string */
-        public String zkConnect = Utils.getString(props, "zk.connect", null);
+        public String zkConnect;
 
         /** zookeeper session timeout */
-        public int zkSessionTimeoutMs = Utils.getInt(props, "zk.sessiontimeout.ms", 6000);
+        public int zkSessionTimeoutMs ;
 
         /** the max time that the client waits to establish a connection to zookeeper */
-        public int zkConnectionTimeoutMs = Utils.getInt(props, "zk.connectiontimeout.ms",zkSessionTimeoutMs);
+        public int zkConnectionTimeoutMs ;
 
         /** how far a ZK follower can be behind a ZK leader */
-        public int zkSyncTimeMs = Utils.getInt(props, "zk.synctime.ms", 2000);
+        public int zkSyncTimeMs ;
 
 
     }
