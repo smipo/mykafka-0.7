@@ -213,10 +213,13 @@ public class ZkUtils {
         String group;
         public ZKGroupDirs(String group){
             this.group =  group;
+            consumerDir = ZkUtils.ConsumersPath;
+            consumerGroupDir = consumerDir + "/" + group;
+            consumerRegistryDir = consumerGroupDir + "/ids";
         }
-        public String consumerDir = ZkUtils.ConsumersPath;
-        public String consumerGroupDir = consumerDir + "/" + group;
-        public String consumerRegistryDir = consumerGroupDir + "/ids";
+        public String consumerDir ;
+        public String consumerGroupDir ;
+        public String consumerRegistryDir ;
     }
 
     public static  class ZKGroupTopicDirs extends ZKGroupDirs {
@@ -224,9 +227,11 @@ public class ZkUtils {
         public ZKGroupTopicDirs(String group,String topic){
             super(group);
             this.topic = topic;
+            consumerOffsetDir = consumerGroupDir + "/offsets/" + topic;
+            consumerOwnerDir = consumerGroupDir + "/owners/" + topic;
         }
-        public String consumerOffsetDir = consumerGroupDir + "/offsets/" + topic;
-        public String consumerOwnerDir = consumerGroupDir + "/owners/" + topic;
+        public String consumerOffsetDir ;
+        public String consumerOwnerDir ;
     }
 
     public static  class ZKConfig{

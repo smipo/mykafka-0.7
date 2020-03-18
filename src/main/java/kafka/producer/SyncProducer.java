@@ -29,13 +29,14 @@ public class SyncProducer {
 
     public SyncProducer(SyncProducerConfig config){
         this.config = config;
+        lastConnectionTime = System.currentTimeMillis() - (long)randomGenerator.nextDouble() * config.reconnectInterval;
     }
 
     private int MaxConnectBackoffMs = 60000;
     private SocketChannel channel  = null;
     private int sentOnConnection = 0;
     /** make time-based reconnect starting at a random time **/
-    private long lastConnectionTime = System.currentTimeMillis() - (long)randomGenerator.nextDouble() * config.reconnectInterval;
+    private long lastConnectionTime ;
     private Object lock = new Object();
     private volatile boolean shutdown = false;
 
