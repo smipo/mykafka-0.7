@@ -32,7 +32,6 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.ToIntFunction;
 import java.util.stream.Collectors;
 
-import static sun.security.jgss.GSSToken.debug;
 
 /**
  * This class handles the consumers interaction with zookeeper
@@ -69,7 +68,7 @@ import static sun.security.jgss.GSSToken.debug;
  * Each consumer tracks the offset of the latest message consumed for each partition.
  *
  */
-public class ZookeeperConsumerConnector {
+public class ZookeeperConsumerConnector implements ConsumerConnector{
 
     private static Logger logger = Logger.getLogger(ZookeeperConsumerConnector.class);
 

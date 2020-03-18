@@ -8,11 +8,9 @@ import kafka.common.NoBrokersForPartitionException;
 import kafka.producer.async.CallbackHandler;
 import kafka.producer.async.EventHandler;
 import kafka.serializer.Encoder;
-import kafka.utils.Three;
 import kafka.utils.Utils;
 import kafka.utils.ZkUtils;
 import org.apache.log4j.Logger;
-import org.omg.CORBA.PUBLIC_MEMBER;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;

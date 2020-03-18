@@ -49,4 +49,20 @@ public class MultiFetchResponse implements Iterable<ByteBufferMessageSet>{
             }
         };
     }
+
+    public ByteBuffer buffer() {
+        return buffer;
+    }
+
+    public int numSets() {
+        return numSets;
+    }
+
+    public long[] offsets() {
+        return offsets;
+    }
+
+    public List<ByteBufferMessageSet> messageSets() {
+        return messageSets;
+    }
 }
