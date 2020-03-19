@@ -83,7 +83,7 @@ public class OffsetRequest  extends Request {
 
         private int size;
         private ByteBuffer header = ByteBuffer.allocate(6);
-        private boolean complete;
+        private volatile boolean complete;
         private ByteBuffer contentBuffer;
 
         public OffsetArraySend(long[] offsets){

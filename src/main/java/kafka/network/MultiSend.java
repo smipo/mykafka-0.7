@@ -1,6 +1,5 @@
 package kafka.network;
 
-import kafka.server.MessageSetSend;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
@@ -14,10 +13,10 @@ public abstract class MultiSend<S extends Send> extends Send{
 
     List<S> sends;
 
-    int expectedBytesToWrite;
+    public int expectedBytesToWrite;
     private S current;
     private Iterator<S> curIte;
-    int totalWritten = 0;
+    public int totalWritten = 0;
 
     public MultiSend(List<S> sends){
         this.sends = sends;

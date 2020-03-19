@@ -29,7 +29,7 @@ public class MessageSetSend extends Send {
     private long size ;
     private ByteBuffer header = ByteBuffer.allocate(6);
 
-    private boolean complete;
+    private volatile boolean complete;
 
     public MessageSetSend(MessageSet messages,
             int errorCode){
@@ -48,12 +48,6 @@ public class MessageSetSend extends Send {
 
     public MessageSetSend(){
         this(new ByteBufferMessageSet(ByteBuffer.allocate(0)));
-    }
-
-    public  static List<ByteBufferSend> messageSetSends(){
-        List<ByteBufferSend> list = new LinkedList<>();
-        list.add(new ByteBufferSend(6));
-        return list;
     }
 
     public long writeTo(GatheringByteChannel channel) throws IOException {

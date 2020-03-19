@@ -305,8 +305,6 @@ public class SocketServer {
             //if(handlerMapping == null) return null;
             short requestTypeId = request.buffer().getShort();
             Send send = handlerMapping.handler(requestTypeId, request);
-            if (send == null)
-                throw new InvalidRequestException("No handler found for request");
             return send;
         }
 
@@ -334,6 +332,8 @@ public class SocketServer {
                 if(maybeResponse != null){
                     key.attach(maybeResponse);
                     key.interestOps(SelectionKey.OP_WRITE);
+                }else{
+                    key.interestOps(SelectionKey.OP_READ);
                 }
             } else {
                 // more reading to be done
@@ -350,7 +350,7 @@ public class SocketServer {
             SocketChannel socketChannel = channelFor(key);
             long written = response.writeTo(socketChannel);
             if (logger.isTraceEnabled())
-                logger.trace(written + " bytes written to " + socketChannel.socket().getRemoteSocketAddress());
+                logger.info(written + " bytes written to " + socketChannel.socket().getRemoteSocketAddress());
             if (response.complete()) {
                 key.attach(null);
                 key.interestOps(SelectionKey.OP_READ);

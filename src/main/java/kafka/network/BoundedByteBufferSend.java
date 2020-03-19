@@ -10,7 +10,7 @@ public class BoundedByteBufferSend extends Send {
 
     private ByteBuffer sizeBuffer = ByteBuffer.allocate(4);
 
-    private boolean complete = false;
+    private volatile boolean complete = false;
 
     public BoundedByteBufferSend(Request request) throws IOException  {
         this(request.sizeInBytes() + 2);

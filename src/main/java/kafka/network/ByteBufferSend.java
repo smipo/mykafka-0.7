@@ -8,11 +8,12 @@ public class ByteBufferSend  extends Send {
 
     ByteBuffer buffer;
 
-    boolean complete;
+   volatile boolean complete;
 
     public ByteBufferSend(ByteBuffer buffer){
         this.buffer = buffer;
     }
+
     public ByteBufferSend(int size) {
         this(ByteBuffer.allocate(size));
     }

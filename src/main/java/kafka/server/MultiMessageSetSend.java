@@ -2,36 +2,41 @@ package kafka.server;
 
 import kafka.network.ByteBufferSend;
 import kafka.network.MultiSend;
+import kafka.network.Send;
 
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
 public class MultiMessageSetSend  extends MultiSend {
 
-    List<MessageSetSend> sets;
-
-    public ByteBuffer buffer ;
-    public int allMessageSetSize ;
-    public int expectedBytesToWrite;
 
     public MultiMessageSetSend(List<MessageSetSend> sets){
-        super(MessageSetSend.messageSetSends());
-        this.sets = sets;
+        super(getSends(sets));
         //todo
+        int allMessageSetSize = 0;
         for(MessageSetSend set:sets){
-            this.allMessageSetSize += set.sendSize();
+            allMessageSetSize += set.sendSize();
         }
         this.expectedBytesToWrite = 4 + 2 + allMessageSetSize;
-
-        this.buffer = ((ByteBufferSend)sends().get(0)).buffer();
-        this.buffer.putInt(2 + allMessageSetSize);
-        this.buffer.putShort((short) 0);
-        this.buffer.rewind();
     }
 
-    public List<MessageSetSend> sets() {
-        return sets;
+    public static List<Send> getSends(List<MessageSetSend> sets){
+        //todo
+        int allMessageSetSize = 0;
+        for(MessageSetSend set:sets){
+            allMessageSetSize += set.sendSize();
+        }
+        List<Send> sends = new ArrayList<>();
+        ByteBufferSend byteBufferSend = new ByteBufferSend(6);
+        ByteBuffer buffer = byteBufferSend.buffer();
+        buffer.putInt(2 + allMessageSetSize);
+        buffer.putShort((short) 0);
+        buffer.rewind();
+        sends.add(byteBufferSend);
+        sends.addAll(sets);
+        return sends;
     }
 }
