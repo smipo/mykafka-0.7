@@ -57,12 +57,17 @@ public class Log {
         while(low <= high) {
             int mid = (high + low) / 2;
             LogSegment found = ranges[mid];
-            if(found.start == value)
-                return found;
-            else if (value < found.start)
+            if (value < found.start) {
                 high = mid - 1;
-            else
+            }else{
+                FileMessageSet fileMessageSet = found.messageSet;
+                Iterator<MessageAndOffset> iterator = fileMessageSet.iterator();
+                while (iterator.hasNext()){
+                    MessageAndOffset messageAndOffset = iterator.next();
+                    if(messageAndOffset.offset() == value) return found;
+                }
                 low = mid + 1;
+            }
         }
         return null;
     }
@@ -234,8 +239,8 @@ public class Log {
             numberOfMessages += 1;
         }
         //Todo
-       // BrokerTopicStat.getBrokerTopicStat(getTopicName).recordMessagesIn(numberOfMessages);
-       // BrokerTopicStat.getBrokerAllTopicStat.recordMessagesIn(numberOfMessages);
+        // BrokerTopicStat.getBrokerTopicStat(getTopicName).recordMessagesIn(numberOfMessages);
+        // BrokerTopicStat.getBrokerAllTopicStat.recordMessagesIn(numberOfMessages);
 
         // truncate the message set's buffer upto validbytes, before appending it to the on-disk log
         ByteBuffer validByteBuffer = messages.getBuffer().duplicate();

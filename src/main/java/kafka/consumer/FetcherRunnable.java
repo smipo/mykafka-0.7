@@ -13,7 +13,9 @@ import org.I0Itec.zkclient.ZkClient;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -64,9 +66,10 @@ public class FetcherRunnable extends Thread{
                     PartitionTopicInfo info = partitionTopicInfos.get(i);
                     fetches[i] =  new FetchRequest(info.topic, info.partition.partId(), info.getFetchOffset(), config.fetchSize);
                 }
-                logger.info("fetch request: " + fetches.toString());
+                String input = Arrays.asList(fetches).toString();
+                logger.info("fetch request: " +  input);
                 MultiFetchResponse response = simpleConsumer.multifetch(fetches);
-                logger.info("recevied response from fetch request: " + fetches.toString());
+                logger.info("recevied response from fetch request: " + input);
                 long read = 0L;
                 List<ByteBufferMessageSet> messagesList = new ArrayList<>();
                 Iterator<ByteBufferMessageSet> iterator = response.iterator();
