@@ -1,5 +1,6 @@
 package kafka.utils;
 
+import kafka.cluster.Partition;
 import kafka.message.CompressionCodec;
 import kafka.message.CompressionFactory;
 import kafka.message.NoCompressionCodec;
@@ -422,5 +423,18 @@ public class Utils {
         Properties props = new Properties();
         props.load(propStream);
         return props;
+    }
+
+    public static TreeSet<Partition> getTreeSetSet(){
+        TreeSet<Partition> treeSet = new TreeSet<>(new Comparator<Partition>() {
+            @Override
+            public int compare(Partition o1, Partition o2) {
+                if (o1.brokerId() == o2.brokerId())
+                    return o1.partId() - o2.partId();
+                else
+                    return o1.brokerId() - o2.brokerId();
+            }
+        });
+        return treeSet;
     }
 }

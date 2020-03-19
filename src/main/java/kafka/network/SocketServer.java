@@ -331,6 +331,10 @@ public class SocketServer {
             } else if (request.complete()) {
                 Send maybeResponse = handle(key, request);
                 key.attach(null);
+                if(maybeResponse != null){
+                    key.attach(maybeResponse);
+                    key.interestOps(SelectionKey.OP_WRITE);
+                }
             } else {
                 // more reading to be done
                 key.interestOps(SelectionKey.OP_READ);

@@ -69,7 +69,7 @@ public class MessageSetSend extends Send {
 
         if (channel instanceof SocketChannel) {
             SocketChannel socketChannel = (SocketChannel)channel;
-            logger.trace(sent + " bytes written to " + socketChannel.socket().getRemoteSocketAddress() + " expecting to send " + size + " bytes");
+            logger.info(sent + " bytes written to " + socketChannel.socket().getRemoteSocketAddress() + " expecting to send " + size + " bytes");
         }
 
         if(sent >= size)

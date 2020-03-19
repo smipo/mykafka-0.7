@@ -29,8 +29,13 @@ public abstract class MultiSend<S extends Send> extends Send{
         expectIncomplete();
         long written = current.writeTo(channel);
         totalWritten += written;
-        if(current.complete())
-            current = curIte.next();
+        if(current.complete()) {
+            if(curIte.hasNext()){
+                current = curIte.next();
+            }else {
+                current = null;
+            }
+        }
         return written;
     }
 

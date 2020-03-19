@@ -56,14 +56,14 @@ public class AsyncProducer<T> {
         this.cbkHandlerProps = cbkHandlerProps;
         queue = new LinkedBlockingQueue<>(config.queueSize);
         // initialize the callback handlers
-        if(eventHandler != null)
-            eventHandler.init(eventHandlerProps);
-        if(cbkHandler != null)
-            cbkHandler.init(cbkHandlerProps);
-        if(eventHandler == null) eventHandler = new DefaultEventHandler<T>(new ProducerConfig(config.props), cbkHandler);
+        if(this.eventHandler != null)
+            this.eventHandler.init(this.eventHandlerProps);
+        if(this.cbkHandler != null)
+            this.cbkHandler.init(this.cbkHandlerProps);
+        if(this.eventHandler == null) this.eventHandler = new DefaultEventHandler<T>(new ProducerConfig(config.props), this.cbkHandler);
         sendThread = new ProducerSendThread("ProducerSendThread-" + asyncProducerID, queue,
-                serializer, producer,eventHandler,
-                cbkHandler, config.queueTime, config.batchSize, AsyncProducer.Shutdown);
+                serializer, producer,this.eventHandler,
+                this.cbkHandler, config.queueTime, config.batchSize, AsyncProducer.Shutdown);
         sendThread.setDaemon(false);
     }
     private AtomicBoolean closed = new AtomicBoolean(false);

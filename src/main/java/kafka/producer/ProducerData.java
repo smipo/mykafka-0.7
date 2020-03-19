@@ -1,4 +1,7 @@
 package kafka.producer;
+
+import java.util.List;
+
 /**
  * Represents the data to be sent using the Producer send API
  * @param topic the topic under which the message is to be published
@@ -8,15 +11,15 @@ package kafka.producer;
 public class ProducerData<K,V> {
     String topic;
     private K key;
-    private V[] data;
+    private List<V> data;
 
-    public ProducerData(String topic, K key, V[] data) {
+    public ProducerData(String topic, K key, List<V> data) {
         this.topic = topic;
         this.key = key;
         this.data = data;
     }
 
-    public ProducerData(String t, V[] d) {
+    public ProducerData(String t, List<V> d) {
         this( t, null, d);
     }
 
@@ -29,7 +32,7 @@ public class ProducerData<K,V> {
         return key;
     }
 
-    public V[] getData(){
+    public List<V> getData(){
         return data;
     }
 }

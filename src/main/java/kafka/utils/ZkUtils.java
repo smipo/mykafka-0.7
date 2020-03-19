@@ -77,7 +77,17 @@ public class ZkUtils {
      * create parrent directory if necessary. Never throw NodeExistException.
      */
     public static void updatePersistentPath(ZkClient client, String path, String data){
-        client.writeData(path, data);
+        try {
+            client.writeData(path, data);
+        }catch (ZkNoNodeException e){
+            createParentPath(client, path);
+            try {
+                client.createPersistent(path, data);
+            }
+            catch (ZkNodeExistsException e1){
+                client.writeData(path, data);
+            }
+        }
     }
 
     /**
@@ -85,15 +95,30 @@ public class ZkUtils {
      * create parrent directory if necessary. Never throw NodeExistException.
      */
     public void updateEphemeralPath(ZkClient client, String path, String data){
-        client.writeData(path, data);
+        try {
+            client.writeData(path, data);
+        } catch(ZkNoNodeException e) {
+            createParentPath(client, path);
+            client.createEphemeral(path, data);
+        }
     }
 
     public static void deletePath(ZkClient client, String path) {
-        client.delete(path);
+        try {
+            client.delete(path);
+        } catch (ZkNoNodeException e){
+            // this can happen during a connection loss event, return normally
+            logger.info(path + " deleted during connection loss; this is ok");
+        }
     }
 
     public static void deletePathRecursive(ZkClient client, String path) {
+        try {
         client.deleteRecursive(path);
+        } catch (ZkNoNodeException e){
+            // this can happen during a connection loss event, return normally
+            logger.info(path + " deleted during connection loss; this is ok");
+        }
     }
 
     public static String readData(ZkClient client, String path){
@@ -111,8 +136,11 @@ public class ZkUtils {
 
     public static List<String> getChildrenParentMayNotExist(ZkClient client,String path) {
         // triggers implicit conversion from java list to scala Seq
-        List<String> ret = client.getChildren(path);
-        return ret;
+        try {
+            return client.getChildren(path);
+        }catch (ZkNoNodeException e){
+            return null;
+        }
     }
 
     /**
@@ -146,7 +174,7 @@ public class ZkUtils {
                 for (int part = 0 ; part < nParts;part++)
                     partList.add(broker + "-" + part);
             }
-          //  partList = partList.sort((s,t) => s < t);
+            //  partList = partList.sort((s,t) => s < t);
             ret.put (topic , partList);
         }
         return ret;

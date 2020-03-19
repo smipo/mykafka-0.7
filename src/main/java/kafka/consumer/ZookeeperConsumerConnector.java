@@ -289,7 +289,7 @@ public class ZookeeperConsumerConnector implements ConsumerConnector{
     }
 
     public void autoCommit() {
-        logger.trace("auto committing");
+//        logger.info("auto committing");
         try {
             commitOffsets();
         }

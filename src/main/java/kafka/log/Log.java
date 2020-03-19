@@ -16,10 +16,7 @@ import java.io.IOException;
 import java.lang.reflect.Array;
 import java.nio.ByteBuffer;
 import java.text.NumberFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Iterator;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
@@ -194,7 +191,7 @@ public class Log {
      */
     private void validateSegments(ArrayList<LogSegment> segments) {
         synchronized(lock) {
-            for(int i = 0;i < segments.size();i++){
+            for(int i = 0;i < segments.size() - 1;i++){
                 LogSegment curr = segments.get(i);
                 LogSegment next = segments.get(i+1);
                 if(curr.start + curr.size() != next.start)
@@ -208,7 +205,7 @@ public class Log {
      * The number of segments in the log
      */
     public int numberOfSegments(){
-        return segments.view().length;
+        return segments.view().size();
     }
 
     /**
@@ -270,8 +267,9 @@ public class Log {
      * Read from the log file at the given offset
      */
     public MessageSet read(long offset, int length) throws IOException {
-        LogSegment[] view = segments.view();
-        LogSegment logSegment = Log.findRange(view, offset, view.length);
+        List<LogSegment> view = segments.view();
+        LogSegment[] logSegments = new LogSegment[view.size()];
+        LogSegment logSegment = Log.findRange(view.toArray(logSegments), offset, view.size());
         if(logSegment == null) return new ByteBufferMessageSet(ByteBuffer.allocate(0));
         return logSegment.messageSet.read((offset - logSegment.start), length);
     }
@@ -281,22 +279,24 @@ public class Log {
      */
     public LogSegment[] markDeletedWhile(LogSegment[] deletable) throws IOException{
         synchronized(lock) {
-            LogSegment[] view = segments.view();
+            List<LogSegment> view = segments.view();
             for(LogSegment seg : deletable)
                 seg.deleted = true;
             int numToDelete = deletable.length;
             // if we are deleting everything, create a new empty segment
-            if(numToDelete == view.length) {
-                if (view[numToDelete - 1].size() > 0)
+            if(numToDelete == view.size()) {
+                if (view.get(numToDelete - 1).size() > 0)
                     roll();
                 else {
                     // If the last segment to be deleted is empty and we roll the log, the new segment will have the same
                     // file name. So simply reuse the last segment and reset the modified time.
-                    view[numToDelete - 1].file.setLastModified(System.currentTimeMillis());
+                    view.get(numToDelete - 1).file.setLastModified(System.currentTimeMillis());
                     numToDelete -= 1;
                 }
             }
-            return segments.trunc(numToDelete);
+            List<LogSegment> list = segments.trunc(numToDelete);
+            LogSegment[] logSegments = new LogSegment[list.size()];
+            return list.toArray(logSegments);
         }
     }
 
@@ -304,7 +304,7 @@ public class Log {
      * Get the size of the log in bytes
      */
     public long size(){
-        return  segments.view()[0].size();
+        return  segments.view().get(0).size();
     }
 
 
@@ -374,17 +374,17 @@ public class Log {
     }
 
     public long[]  getOffsetsBefore(OffsetRequest request) {
-        LogSegment[] segsArray = segments.view();
+        List<LogSegment> segsArray = segments.view();
         Pair<Long,Long>[] offsetTimeArray = null;
         if (segments.last().size() > 0)
-            offsetTimeArray = new Pair[segsArray.length + 1];
+            offsetTimeArray = new Pair[segsArray.size() + 1];
         else
-            offsetTimeArray = new Pair[segsArray.length];
+            offsetTimeArray = new Pair[segsArray.size()];
 
-        for (int i = 0;i < segsArray.length;i++)
-            offsetTimeArray[i] = new Pair<>(segsArray[i].start, segsArray[i].file.lastModified());
+        for (int i = 0;i < segsArray.size();i++)
+            offsetTimeArray[i] = new Pair<>(segsArray.get(i).start, segsArray.get(i).file.lastModified());
         if (segments.last().size() > 0)
-            offsetTimeArray[segsArray.length] = new Pair<>(segments.last().start + segments.last().messageSet.highWaterMark(), System.currentTimeMillis());
+            offsetTimeArray[segsArray.size()] = new Pair<>(segments.last().start + segments.last().messageSet.highWaterMark(), System.currentTimeMillis());
 
         int startIndex = -1;
         if(request.time == OffsetRequest.LatestTime )

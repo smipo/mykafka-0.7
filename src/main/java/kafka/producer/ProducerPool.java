@@ -99,9 +99,9 @@ public class ProducerPool<V> {
     /**
      * add a new producer, either synchronous or asynchronous, connecting
      * to the specified broker
-     * @param bid the id of the broker
-     * @param host the hostname of the broker
-     * @param port the port of the broker
+     * @param broker bid the id of the broker
+     * @param broker host the hostname of the broker
+     * @param broker port the port of the broker
      */
     public void addProducer(Broker broker) {
         Properties props = new Properties();
@@ -140,14 +140,14 @@ public class ProducerPool<V> {
         Iterator<Integer> iterator = distinctBrokers.iterator();
         while (iterator.hasNext()) {
             Integer bid = iterator.next();
-            List<ProducerPoolData<V>> requestsForThisBid = remainingRequests.stream().filter(t -> t.getBidPid().brokerId() != bid).collect(Collectors.toList());
-            remainingRequests = remainingRequests.stream().filter(t -> t.getBidPid().brokerId() == bid).collect(Collectors.toList());
+            List<ProducerPoolData<V>> requestsForThisBid = remainingRequests.stream().filter(t -> t.getBidPid().brokerId() == bid).collect(Collectors.toList());
+            remainingRequests = remainingRequests.stream().filter(t -> t.getBidPid().brokerId() != bid).collect(Collectors.toList());
             if (sync) {
                 List<ProducerRequest> producerRequests = new ArrayList<>();
                 for (ProducerPoolData<V> req : requestsForThisBid) {
-                    Message[] messages = new Message[req.getData().length];
-                    for (int i = 0; i < req.getData().length; i++) {
-                        messages[i] = serializer.toMessage(req.getData()[i]);
+                    Message[] messages = new Message[req.getData().size()];
+                    for (int i = 0; i < req.getData().size(); i++) {
+                        messages[i] = serializer.toMessage(req.getData().get(i));
                     }
                     producerRequests.add(new ProducerRequest(req.getTopic(), req.getBidPid().partId(),
                             new ByteBufferMessageSet(config.compressionCodec,
@@ -156,8 +156,10 @@ public class ProducerPool<V> {
                 logger.debug("Fetching sync producer for broker id: " + bid);
                 SyncProducer producer = syncProducers.get(bid);
                 if (producer != null) {
-                    if (producerRequests.size() > 1)
-                        producer.multiSend((ProducerRequest[]) producerRequests.toArray());
+                    if (producerRequests.size() > 1) {
+                        ProducerRequest[] producerRequests1 = new ProducerRequest[producerRequests.size()];
+                        producer.multiSend(producerRequests.toArray(producerRequests1));
+                    }
                     else
                         producer.send(producerRequests.get(0).topic(),
                                 producerRequests.get(0).partition(),
@@ -203,16 +205,16 @@ public class ProducerPool<V> {
      * @param bidPid the broker id and partition id
      * @param data the data to be published
      */
-    public <V> ProducerPoolData<V> getProducerPoolData(String topic ,Partition bidPid,V[] data) {
+    public <V> ProducerPoolData<V> getProducerPoolData(String topic ,Partition bidPid,List<V>  data) {
         return new ProducerPoolData<>(topic, bidPid, data);
     }
 
     public class ProducerPoolData<V>{
         String topic;
         Partition bidPid;
-        V[] data;
+        List<V> data;
 
-        public ProducerPoolData(String topic, Partition bidPid, V[] data) {
+        public ProducerPoolData(String topic, Partition bidPid, List<V> data) {
             this.topic = topic;
             this.bidPid = bidPid;
             this.data = data;
@@ -234,11 +236,11 @@ public class ProducerPool<V> {
             this.bidPid = bidPid;
         }
 
-        public V[] getData() {
+        public List<V> getData() {
             return data;
         }
 
-        public void setData(V[] data) {
+        public void setData(List<V> data) {
             this.data = data;
         }
     }

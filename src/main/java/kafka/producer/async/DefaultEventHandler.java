@@ -31,7 +31,8 @@ public class DefaultEventHandler<T> implements  EventHandler<T>{
         QueueItem<T>[] processedEvents = events;
         if(cbkHandler != null) {
             List<QueueItem<T>> queueItemList = cbkHandler.beforeSendingData(events);
-            processedEvents = (QueueItem<T>[])queueItemList.toArray();
+            QueueItem<T>[] queueItems = new QueueItem[queueItemList.size()];
+            processedEvents = queueItemList.toArray(queueItems);
         }
 
         send(serialize(collate(processedEvents), serializer), syncProducer);

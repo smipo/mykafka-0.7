@@ -42,9 +42,11 @@ public class Producer extends Thread
   public void run() {
     try{
       int messageNo = 1;
-      while(true)
+      //while(true)
+      for(int i = 0;i < 10;i++)
       {
-        String messageStr = new String("Message_" + messageNo);
+        String messageStr = new String("TESTTEST_" + messageNo);
+        System.out.println(messageStr);
         producer.send(new ProducerData<Integer, String>(topic, messageStr));
         messageNo++;
       }

@@ -40,15 +40,15 @@ public class KafkaRequestHandlers implements Handler{
     public Send handleProducerRequest(Receive receive) throws Exception{
         long sTime = System.currentTimeMillis();
         ProducerRequest request = ProducerRequest.readFrom(receive.buffer());
-        logger.trace("Producer request " + request.toString());
+        logger.info("Producer request " + request.toString());
         handleProducerRequest(request, "ProduceRequest");
-        logger.debug("kafka produce time " + (System.currentTimeMillis() - sTime) + " ms");
+        logger.info("kafka produce time " + (System.currentTimeMillis() - sTime) + " ms");
         return null;
     }
 
     public Send handleMultiProducerRequest(Receive receive) throws Exception{
         MultiProducerRequest request = MultiProducerRequest.readFrom(receive.buffer());
-        logger.trace("Multiproducer request " + request.toString());
+        logger.info("Multiproducer request " + request.toString());
         for(ProducerRequest producerRequest:request.produces()){
             handleProducerRequest(producerRequest, "MultiProducerRequest");
         }
@@ -62,7 +62,7 @@ public class KafkaRequestHandlers implements Handler{
         }
         try {
             logManager.getOrCreateLog(request.topic(), partition).append(request.messages());
-            logger.trace(request.messages().sizeInBytes() + " bytes written to logs.");
+            logger.info(request.messages().sizeInBytes() + " bytes written to logs.");
         }
         catch (MessageSizeTooLargeException e){
             logger.warn(e.getMessage() + " on " + request.topic() + ":" + partition);
@@ -74,13 +74,13 @@ public class KafkaRequestHandlers implements Handler{
 
     public Send handleFetchRequest(Receive request)  throws IOException{
         FetchRequest fetchRequest = FetchRequest.readFrom(request.buffer());
-        logger.trace("Fetch request " + fetchRequest.toString());
+        logger.info("Fetch request " + fetchRequest.toString());
         return readMessageSet(fetchRequest);
     }
 
     public  Send handleMultiFetchRequest(Receive request) throws IOException{
         MultiFetchRequest multiFetchRequest = MultiFetchRequest.readFrom(request.buffer());
-        logger.trace("Multifetch request");
+        logger.info("Multifetch request " + request.toString());
         List<MessageSetSend> responses = new ArrayList<>();
         for(FetchRequest fetch:multiFetchRequest.fetches()){
             responses.add(readMessageSet(fetch));
@@ -91,7 +91,7 @@ public class KafkaRequestHandlers implements Handler{
     private MessageSetSend readMessageSet(FetchRequest fetchRequest) {
         MessageSetSend  response = null;
         try {
-            logger.trace("Fetching log segment for topic, partition, offset, maxSize = " + fetchRequest);
+            logger.info("Fetching log segment for topic, partition, offset, maxSize = " + fetchRequest);
             Log log = logManager.getLog(fetchRequest.topic(), fetchRequest.partition());
             if (log != null) {
                 response = new MessageSetSend(log.read(fetchRequest.offset(), fetchRequest.maxSize()));
@@ -108,7 +108,7 @@ public class KafkaRequestHandlers implements Handler{
 
     public Send handleOffsetRequest(Receive request) throws IOException,InterruptedException {
         OffsetRequest offsetRequest = OffsetRequest.readFrom(request.buffer());
-        logger.trace("Offset request " + offsetRequest.toString());
+        logger.info("Offset request " + offsetRequest.toString());
         long[] offsets = logManager.getOffsets(offsetRequest);
         OffsetRequest.OffsetArraySend response = new OffsetRequest.OffsetArraySend(offsets);
         return response;

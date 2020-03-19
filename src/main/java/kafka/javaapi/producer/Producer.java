@@ -7,6 +7,7 @@ import kafka.producer.SyncProducer;
 import kafka.producer.async.QueueItem;
 import kafka.serializer.Encoder;
 import kafka.utils.Utils;
+import org.omg.CORBA.Object;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
@@ -114,7 +115,7 @@ public class Producer<K,V> {
      */
     public void send( kafka.javaapi.producer.ProducerData<K,V> producerData) throws Exception{
         underlying.send(new kafka.producer.ProducerData<K,V>(producerData.getTopic(), producerData.getKey(),
-                (V[])producerData.getData().toArray()));
+                producerData.getData()));
     }
 
     /**
@@ -124,7 +125,7 @@ public class Producer<K,V> {
     public void  send(java.util.List<kafka.javaapi.producer.ProducerData<K,V>> producerDatas) throws Exception{
         for(kafka.javaapi.producer.ProducerData<K,V> producerData:producerDatas){
             underlying.send(new kafka.producer.ProducerData<K,V>(producerData.getTopic(), producerData.getKey(),
-                    (V[])producerData.getData().toArray()));
+                    producerData.getData()));
         }
     }
 

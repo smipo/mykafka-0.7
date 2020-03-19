@@ -3,6 +3,7 @@ package kafka.producer;
 import kafka.cluster.Broker;
 import kafka.cluster.Partition;
 import kafka.common.InvalidConfigException;
+import kafka.utils.Utils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -63,7 +64,7 @@ public class ConfigBrokerPartitionInfo implements BrokerPartitionInfo {
         String[] brokerInfoList = config.brokerList.split(",");
         if(brokerInfoList.length == 0) throw new InvalidConfigException("broker.list is empty");
         // check if each individual broker info is valid => (brokerId: brokerHost: brokerPort)
-        SortedSet<Partition> brokerParts = new TreeSet<>();
+        SortedSet<Partition> brokerParts = Utils.getTreeSetSet();
         for(String bInfo:brokerInfoList){
             String[] brokerInfo = bInfo.split(":");
             if(brokerInfo.length < 3) throw new InvalidConfigException("broker.list has invalid value");

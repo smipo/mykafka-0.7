@@ -18,6 +18,20 @@ public class ByteBufferMessageSet extends MessageSet {
     private int errorCode = ErrorMapping.NoError;
 
     public ByteBufferMessageSet(ByteBuffer buffer, long initialOffset, int errorCode) {
+      init(buffer,initialOffset,errorCode);
+    }
+
+    public ByteBufferMessageSet(ByteBuffer buffer) {
+        init(buffer, 0L, ErrorMapping.NoError);
+    }
+
+    public ByteBufferMessageSet(CompressionCodec compressionCodec,java.util.List<Message> messages) throws IOException {
+        Message[] messages1 = new Message[messages.size()];
+        init(kafka.message.MessageSet.createByteBuffer(compressionCodec,messages.toArray(messages1)),
+                0L, ErrorMapping.NoError);
+    }
+
+    private void init(ByteBuffer buffer, long initialOffset, int errorCode){
         this.buffer = buffer;
         this.initialOffset = initialOffset;
         this.errorCode = errorCode;
@@ -26,16 +40,6 @@ public class ByteBufferMessageSet extends MessageSet {
                 initialOffset,
                 errorCode);
     }
-
-    public ByteBufferMessageSet(ByteBuffer buffer) {
-        this(buffer, 0L, ErrorMapping.NoError);
-    }
-
-    public ByteBufferMessageSet(CompressionCodec compressionCodec,java.util.List<Message> messages) throws IOException {
-        this(kafka.message.MessageSet.createByteBuffer(compressionCodec,(Message[])messages.toArray()),
-                0L, ErrorMapping.NoError);
-    }
-
     public ByteBufferMessageSet(java.util.List<Message> messages) throws IOException{
         this(new NoCompressionCodec(), messages);
     }

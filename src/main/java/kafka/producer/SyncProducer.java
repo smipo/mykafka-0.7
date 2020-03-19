@@ -86,7 +86,6 @@ public class SyncProducer {
                 send.writeCompletely(channel);
             } catch (IOException e){
                 disconnect();
-                throw e;
             }
             // TODO: do we still need this?
             sentOnConnection += 1;

@@ -2,10 +2,7 @@ package kafka.producer;
 
 import kafka.cluster.Broker;
 import kafka.cluster.Partition;
-import kafka.utils.Pair;
-import kafka.utils.Three;
-import kafka.utils.ZKStringSerializer;
-import kafka.utils.ZkUtils;
+import kafka.utils.*;
 import org.I0Itec.zkclient.IZkChildListener;
 import org.I0Itec.zkclient.IZkStateListener;
 import org.I0Itec.zkclient.ZkClient;
@@ -78,7 +75,7 @@ public class ZKBrokerPartitionInfo implements BrokerPartitionInfo{
             brokerPartitions.add(new Pair<>(bid,numPartition));
         }
         brokerPartitions.sort((brokerPartition1, brokerPartition2) -> brokerPartition1.getKey().compareTo(brokerPartition2.getKey()));
-        SortedSet<Partition> brokerParts = new TreeSet<>();
+        SortedSet<Partition> brokerParts = Utils.getTreeSetSet();
         for(Pair<Integer,Integer> bp:brokerPartitions){
             for(int i = 0 ;i < bp.getValue();i++) {
                 Partition bidPid = new Partition(bp.getKey(), i);
@@ -96,7 +93,7 @@ public class ZKBrokerPartitionInfo implements BrokerPartitionInfo{
     public SortedSet<Partition> getBrokerPartitionInfo(String topic) {
         synchronized(zkWatcherLock) {
             SortedSet<Partition> brokerPartitions = topicBrokerPartitions.get(topic);
-            SortedSet<Partition> numBrokerPartitions = new TreeSet<>();
+            SortedSet<Partition> numBrokerPartitions = Utils.getTreeSetSet();
             if(brokerPartitions == null){ // no brokers currently registered for this topic. Find the list of all brokers in the cluster.
                 numBrokerPartitions = bootstrapWithExistingBrokers(topic);
                 topicBrokerPartitions.put (topic , numBrokerPartitions);
@@ -147,7 +144,7 @@ public class ZKBrokerPartitionInfo implements BrokerPartitionInfo{
         logger.trace("List of all brokers currently registered in zookeeper = " + allBrokersIds.toString());
         // since we do not have the in formation about number of partitions on these brokers, just assume single partition
         // i.e. pick partition 0 from each broker as a candidate
-        TreeSet<Partition> numBrokerPartitions = new TreeSet<>();
+        TreeSet<Partition> numBrokerPartitions = Utils.getTreeSetSet();
         for(String brokerId:allBrokersIds){
             numBrokerPartitions.add(new Partition(Integer.parseInt(brokerId), 0));
         }
@@ -178,7 +175,7 @@ public class ZKBrokerPartitionInfo implements BrokerPartitionInfo{
             brokerPartitions.sort((brokerPartition1, brokerPartition2) -> brokerPartition1.getKey().compareTo(brokerPartition2.getKey()));
             logger.debug("Broker ids and # of partitions on each for topic: " + topic + " = " + brokerPartitions.toString());
 
-            SortedSet<Partition> brokerParts = new TreeSet<>();
+            SortedSet<Partition> brokerParts = Utils.getTreeSetSet();
             for(Pair<Integer,Integer> bp:brokerPartitions){
                 for(int i = 0 ;i < bp.getValue();i++) {
                     Partition bidPid = new Partition(bp.getKey(), i);
@@ -337,7 +334,7 @@ public class ZKBrokerPartitionInfo implements BrokerPartitionInfo{
             logger.debug("[BrokerTopicsListener] Currently registered list of brokers for topic: " + topic + " are " +
                     curChilds.toString());
             // update the number of partitions on existing brokers
-            SortedSet<Partition> mergedBrokerParts = new TreeSet<>();
+            SortedSet<Partition> mergedBrokerParts = Utils.getTreeSetSet();
             mergedBrokerParts.addAll(updatedBrokerParts);
             SortedSet<Partition> oldBrokerParts = topicBrokerPartitions.get(topic);
             if(oldBrokerParts != null){

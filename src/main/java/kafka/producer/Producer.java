@@ -92,23 +92,23 @@ public class Producer<K,V> {
         this.populateProducerPool = populateProducerPool;
         this.brokerPartitionInfo = brokerPartitionInfo;
 
-        zkEnabled = Utils.propertyExists(config.zkConnect);
-        if(brokerPartitionInfo == null) {
-            if(zkEnabled){
+        this.zkEnabled = Utils.propertyExists(config.zkConnect);
+        if(this.brokerPartitionInfo == null) {
+            if(this.zkEnabled){
                 Properties zkProps = new Properties();
                 zkProps.put("zk.connect", config.zkConnect);
                 zkProps.put("zk.sessiontimeout.ms", config.zkSessionTimeoutMs);
                 zkProps.put("zk.connectiontimeout.ms", config.zkConnectionTimeoutMs);
                 zkProps.put("zk.synctime.ms", config.zkSyncTimeMs);
-                brokerPartitionInfo = new ZKBrokerPartitionInfo(new ZkUtils.ZKConfig(zkProps),new ArrayList<>());
+                this.brokerPartitionInfo = new ZKBrokerPartitionInfo(new ZkUtils.ZKConfig(zkProps),new ArrayList<>());
             }else{
-                brokerPartitionInfo = new ConfigBrokerPartitionInfo(config);
+                this.brokerPartitionInfo = new ConfigBrokerPartitionInfo(config);
             }
         }
 
         // pool of producers, one per broker
         if(populateProducerPool) {
-            Map<Integer, Broker> allBrokers = brokerPartitionInfo.getAllBrokerInfo();
+            Map<Integer, Broker> allBrokers = this.brokerPartitionInfo.getAllBrokerInfo();
             allBrokers.values().forEach(b -> producerPool.addProducer(new Broker(b.id(), b.host(), b.host(), b.port())));
         }
     }
@@ -193,7 +193,8 @@ public class Producer<K,V> {
         logger.debug("Broker partitions registered for topic: " + pd.getTopic() + " = " + topicPartitionsList.toString());
         int totalNumPartitions = topicPartitionsList.size();
         if(totalNumPartitions == 0) throw new NoBrokersForPartitionException("Partition = " + pd.getKey());
-        return (Partition[])topicPartitionsList.toArray();
+        Partition[] partitions = new Partition[topicPartitionsList.size()];
+        return topicPartitionsList.toArray(partitions);
     }
 
     /**

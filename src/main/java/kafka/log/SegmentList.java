@@ -3,6 +3,7 @@ package kafka.log;
 
 import kafka.common.KafkaException;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -15,15 +16,11 @@ import java.util.concurrent.atomic.AtomicReference;
 public class SegmentList<T> {
 
 
-    private AtomicReference<Object[]> contents = new AtomicReference();
+    private AtomicReference<List<T>> contents = new AtomicReference();
 
     public SegmentList(List<T> logSegments){
         if(logSegments != null && logSegments.size() > 0){
-            Object[] obj = new Object[logSegments.size()];
-            for(int i = 0;i < logSegments.size();i++){
-                obj[i] = logSegments.get(i);
-            }
-            contents.set(obj);
+            contents.set(logSegments);
         }
     }
 
@@ -31,28 +28,25 @@ public class SegmentList<T> {
      * Append the given items to the end of the list
      */
     public void append(T... ts) {
-        Object[] curr = contents.get();
-        Object[] updated = new Object[curr.length + ts.length];
-        System.arraycopy(curr, 0, updated, 0, curr.length);
+        List<T> curr = contents.get();
         for(int i = 0;i < ts.length;i++)
-            updated[curr.length + i] = ts[i];
-        contents.set(updated);
+            curr.add(ts[i]);
     }
     /**
      * Delete the first n items from the list
      */
-    public T[]  trunc(int newStart) {
+    public  List<T> trunc(int newStart) {
         if(newStart < 0)
             throw new KafkaException("Starting index must be positive.");
-        Object[] curr = contents.get();
-        if (curr.length > 0) {
-            int newLength = Math.max(curr.length - newStart, 0);
-            Object[] updated = new Object[newLength];
-            System.arraycopy(curr, Math.min(newStart, curr.length - 1), updated, 0, newLength);
+        List<T> curr = contents.get();
+        if (curr.size() > 0) {
+            int newLength = Math.max(curr.size() - newStart, 0);
+            List<T> updated = new ArrayList<>();
+            System.arraycopy(curr, Math.min(newStart, curr.size() - 1), updated, 0, newLength);
             contents.set(updated);
-            Object[] deleted  = new Object[newStart];
-            System.arraycopy(curr, 0, deleted, 0, curr.length - newLength);
-            return (T[])deleted;
+            List<T> deleted  = new ArrayList<>();
+            System.arraycopy(curr, 0, deleted, 0, curr.size() - newLength);
+            return deleted;
         }
         return null;
     }
@@ -60,18 +54,18 @@ public class SegmentList<T> {
     /**
      * Delete the items from position (newEnd + 1) until end of list
      */
-    public T[]   truncLast(int newEnd) {
-        if (newEnd < 0 || newEnd >= contents.get().length)
-            throw new KafkaException("Attempt to truncate segment list of length %d to %d.".format(String.valueOf(contents.get().length), newEnd));
-        Object[] curr = contents.get();
-        if (curr.length > 0) {
+    public List<T> truncLast(int newEnd) {
+        if (newEnd < 0 || newEnd >= contents.get().size())
+            throw new KafkaException("Attempt to truncate segment list of length %d to %d.".format(String.valueOf(contents.get().size()), newEnd));
+        List<T> curr = contents.get();
+        if (curr.size() > 0) {
             int newLength = newEnd + 1;
-            Object[] updated = new Object[newLength];
+            List<T> updated = new ArrayList<>();
             System.arraycopy(curr, 0, updated, 0, newLength);
             contents.set(updated);
-            Object[] deleted  = new Object[curr.length - newLength];
-            System.arraycopy(curr, Math.min(newEnd + 1, curr.length - 1), deleted, 0, curr.length - newLength);
-            return (T[])deleted;
+            List<T> deleted  = new ArrayList<>();
+            System.arraycopy(curr, Math.min(newEnd + 1, curr.size() - 1), deleted, 0, curr.size() - newLength);
+            return deleted;
         }
         return null;
     }
@@ -79,14 +73,15 @@ public class SegmentList<T> {
     /**
      * Get a consistent view of the sequence
      */
-    public T[] view(){
+    public  List<T> view(){
         if(contents.get() == null) return null;
-        return (T[])contents.get();
+        return contents.get();
     }
 
     public T last(){
-        if(view() == null) return null;
-        return view()[view().length - 1];
+        List<T> curr = contents.get();
+        if(curr == null) return null;
+        return curr.get(curr.size() - 1);
     }
     /**
      * Nicer toString method

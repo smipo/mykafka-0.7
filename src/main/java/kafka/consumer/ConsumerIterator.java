@@ -69,7 +69,7 @@ public class ConsumerIterator<T> extends IteratorTemplate<MessageAndMetadata<T>>
                 logger.error("consumer makeNext Eeror:",e);
             }
             //todo
-            if(currentDataChunk.equals(ZookeeperConsumerConnector.shutdownCommand)) {
+            if(currentDataChunk == null || currentDataChunk.fetchOffset == -1L || currentDataChunk.equals(ZookeeperConsumerConnector.shutdownCommand)) {
                 logger.debug("Received the shutdown command");
                 channel.offer(currentDataChunk);
                 return allDone();

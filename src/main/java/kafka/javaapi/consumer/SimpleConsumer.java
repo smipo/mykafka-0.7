@@ -30,9 +30,9 @@ public class SimpleConsumer {
      *  @return a set of fetched messages
      */
     public ByteBufferMessageSet fetch(FetchRequest request)throws IOException {
-       kafka.message.ByteBufferMessageSet messageSet = underlying.fetch(request);
-       return new kafka.javaapi.message.ByteBufferMessageSet(messageSet.getBuffer(), messageSet.getInitialOffset(),
-               messageSet.getErrorCode());
+        kafka.message.ByteBufferMessageSet messageSet = underlying.fetch(request);
+        return new kafka.javaapi.message.ByteBufferMessageSet(messageSet.getBuffer(), messageSet.getInitialOffset(),
+                messageSet.getErrorCode());
     }
 
     /**
@@ -42,8 +42,9 @@ public class SimpleConsumer {
      *  @return a sequence of fetch responses
      */
     public MultiFetchResponse multifetch(java.util.List<FetchRequest> fetches) throws IOException{
-        kafka.api.MultiFetchResponse response = underlying.multifetch((FetchRequest[])fetches.toArray());
-       return new kafka.javaapi.MultiFetchResponse(response.buffer(), response.numSets(), response.offsets());
+        FetchRequest[] fetchRequests = new FetchRequest[fetches.size()];
+        kafka.api.MultiFetchResponse response = underlying.multifetch(fetches.toArray(fetchRequests));
+        return new kafka.javaapi.MultiFetchResponse(response.buffer(), response.numSets(), response.offsets());
     }
 
     /**

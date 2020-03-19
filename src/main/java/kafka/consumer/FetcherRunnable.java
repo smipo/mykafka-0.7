@@ -64,9 +64,9 @@ public class FetcherRunnable extends Thread{
                     PartitionTopicInfo info = partitionTopicInfos.get(i);
                     fetches[i] =  new FetchRequest(info.topic, info.partition.partId(), info.getFetchOffset(), config.fetchSize);
                 }
-                logger.trace("fetch request: " + fetches.toString());
+                logger.info("fetch request: " + fetches.toString());
                 MultiFetchResponse response = simpleConsumer.multifetch(fetches);
-                logger.trace("recevied response from fetch request: " + fetches.toString());
+                logger.info("recevied response from fetch request: " + fetches.toString());
                 long read = 0L;
                 List<ByteBufferMessageSet> messagesList = new ArrayList<>();
                 Iterator<ByteBufferMessageSet> iterator = response.iterator();

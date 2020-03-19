@@ -68,14 +68,8 @@ public class LogManager {
                 } else {
                     logger.info("Loading log '" + dir.getName() + "'");
                     String topic = Utils.getTopicPartition(dir.getName()).getKey();
-                    Long rollIntervalMs = logRollMsMap.get(topic);
-                    if(rollIntervalMs == null){
-                        rollIntervalMs = logRollMsMap.get(this.logRollDefaultIntervalMs);
-                    }
-                    Integer maxLogFileSize = logFileSizeMap.get(topic);
-                    if(maxLogFileSize == null){
-                        maxLogFileSize = logFileSizeMap.get(config.logFileSize);
-                    }
+                    Long rollIntervalMs = logRollMsMap.getOrDefault(topic,this.logRollDefaultIntervalMs);
+                    Integer maxLogFileSize = logFileSizeMap.getOrDefault(topic,config.logFileSize);
                     Log log = new Log(dir, milliseconds, maxLogFileSize, config.maxMessageSize, flushInterval, rollIntervalMs, needRecovery);
                     Pair<String, Integer> topicPartion = Utils.getTopicPartition(dir.getName());
                     logs.putIfNotExists(topicPartion.getKey(), new Pool<Integer, Log>());
@@ -269,7 +263,7 @@ public class LogManager {
         long startMs = milliseconds;
         String topic = Utils.getTopicPartition(log.dir().getName()).getKey();
         long logCleanupThresholdMS = logRetentionMsMap.getOrDefault(topic,this.logCleanupDefaultAgeMs);
-        Log.LogSegment[] logSegments = log.segments().view();
+        List<Log.LogSegment> logSegments = log.segments().view();
         List<Log.LogSegment> list = new ArrayList<>();
         for(Log.LogSegment segment : logSegments){
             if(startMs - segment.file.lastModified() > logCleanupThresholdMS){
@@ -293,7 +287,7 @@ public class LogManager {
         int maxLogRetentionSize = logRetentionSizeMap.getOrDefault(topic,(int)config.logRetentionSize);
         if(maxLogRetentionSize < 0 || log.size() < maxLogRetentionSize) return 0;
         long diff = log.size() - maxLogRetentionSize;
-        Log.LogSegment[] logSegments = log.segments().view();
+        List<Log.LogSegment> logSegments = log.segments().view();
         List<Log.LogSegment> list = new ArrayList<>();
         for(Log.LogSegment segment : logSegments){
             if(diff - segment.size() >= 0) {
