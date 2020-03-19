@@ -128,8 +128,8 @@ public class ByteBufferMessageSet extends MessageSet {
                 int size = topIter.getInt();
                 lastMessageSize = size;
 
-                logger.trace("Remaining bytes in iterator = " + topIter.remaining());
-                logger.trace("size of data = " + size);
+                logger.info("Remaining bytes in iterator = " + topIter.remaining());
+                logger.info("size of data = " + size);
 
                 if(size < 0 || topIter.remaining() < size) {
                     if (currValidBytes == initialOffset || size < 0)
@@ -141,7 +141,7 @@ public class ByteBufferMessageSet extends MessageSet {
                 ByteBuffer message = topIter.slice();
                 message.limit(size);
                 topIter.position(topIter.position() + size);
-                Message newMessage = new Message(message.array());
+                Message newMessage = new Message(message);
                 if(!newMessage.isValid())
                     throw new InvalidMessageException("message is invalid, compression codec: " + newMessage.compressionCodec()
                             + " size: " + size + " curr offset: " + currValidBytes + " init offset: " + initialOffset);

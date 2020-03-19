@@ -45,7 +45,7 @@ public class Producer extends Thread
       //while(true)
       for(int i = 0;i < 10;i++)
       {
-        String messageStr = new String("TESTTEST_" + messageNo);
+        String messageStr = new String("asdfghj" + messageNo);
         System.out.println(messageStr);
         producer.send(new ProducerData<Integer, String>(topic, messageStr));
         messageNo++;

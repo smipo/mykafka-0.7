@@ -2,6 +2,7 @@ package kafka.message;
 
 import kafka.common.UnknownMagicByteException;
 import kafka.utils.Utils;
+import org.apache.log4j.Logger;
 
 import java.nio.ByteBuffer;
 
@@ -28,6 +29,8 @@ import java.nio.ByteBuffer;
  *
  */
 public class Message {
+
+    private static Logger logger = Logger.getLogger(Message.class);
 
     public static byte MagicVersion1 = 0;
     public static byte MagicVersion2 = 1;
@@ -90,8 +93,12 @@ public class Message {
 
     protected ByteBuffer buffer;
 
-    public Message(long checksum, byte[] bytes, CompressionCodec compressionCodec){
-        this.buffer = ByteBuffer.allocate(Message.headerSize(Message.CurrentMagicValue) + bytes.length);
+    public Message(ByteBuffer buffer) {
+        this.buffer = buffer;
+    }
+
+    private Message(long checksum, byte[] bytes, CompressionCodec compressionCodec){
+        this(ByteBuffer.allocate(Message.headerSize(Message.CurrentMagicValue) + bytes.length));
         buffer.put(CurrentMagicValue);
         byte attributes = 0;
         if (compressionCodec.codec() > 0) {
@@ -101,6 +108,7 @@ public class Message {
         Utils.putUnsignedInt(buffer, checksum);
         buffer.put(bytes);
         buffer.rewind();
+        logger.info("Message content:"+new String(bytes));
     }
 
     public Message(long checksum, byte[] bytes) {

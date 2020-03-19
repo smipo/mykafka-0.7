@@ -149,7 +149,7 @@ public class FileMessageSet extends MessageSet {
 
                 // increment the location and return the item
                 location += size + 4;
-                return  new MessageAndOffset(new Message(buffer.array()), location);
+                return  new MessageAndOffset(new Message(buffer), location);
             }
         };
     }
@@ -260,7 +260,7 @@ public class FileMessageSet extends MessageSet {
                 curr += read;
         }
         messageBuffer.rewind();
-        Message message = new Message(messageBuffer.array());
+        Message message = new Message(messageBuffer);
         if(!message.isValid())
             return -1;
         else
