@@ -42,10 +42,10 @@ public class ConsumerIterator<T> extends IteratorTemplate<MessageAndMetadata<T>>
     public MessageAndMetadata<T>  next(){
         MessageAndMetadata<T>  item = super.next();
         if(consumedOffset < 0)
-            throw new IllegalStateException("Offset returned by the message set is invalid %d".format(consumedOffset + ""));
+            throw new IllegalStateException(String.format("Offset returned by the message set is invalid %d",consumedOffset));
         currentTopicInfo.resetConsumeOffset(consumedOffset);
         String topic = currentTopicInfo.topic;
-        logger.trace("Setting %s consumed offset to %d".format(topic, consumedOffset));
+        logger.trace(String.format("Setting %s consumed offset to %d",topic, consumedOffset));
         return item;
     }
 
@@ -76,8 +76,8 @@ public class ConsumerIterator<T> extends IteratorTemplate<MessageAndMetadata<T>>
             } else {
                 currentTopicInfo = currentDataChunk.topicInfo();
                 if (currentTopicInfo.getConsumeOffset() != currentDataChunk.fetchOffset) {
-                    logger.error("consumed offset: %d doesn't match fetch offset: %d for %s;\n Consumer may lose data"
-                            .format(currentTopicInfo.getConsumeOffset() + "", currentDataChunk.fetchOffset, currentTopicInfo));
+                    logger.error(String
+                            .format("consumed offset: %d doesn't match fetch offset: %d for %s;\n Consumer may lose data",currentTopicInfo.getConsumeOffset(), currentDataChunk.fetchOffset, currentTopicInfo));
                     currentTopicInfo.resetConsumeOffset(currentDataChunk.fetchOffset);
                 }
                 if (enableShallowIterator) localCurrent =  currentDataChunk.messages.shallowIterator();

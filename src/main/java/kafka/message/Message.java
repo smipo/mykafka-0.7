@@ -60,7 +60,7 @@ public class Message {
         }else if(magic == MagicVersion2){
             return AttributeOffset + AttributeLength;
         }else{
-            throw new UnknownMagicByteException("Magic byte value of %d is unknown".format(String.valueOf(magic)));
+            throw new UnknownMagicByteException(String.format("Magic byte value of %d is unknown",magic));
         }
     }
 
@@ -176,7 +176,7 @@ public class Message {
     }
     @Override
     public String toString(){
-        return  "message(magic = %d, attributes = %d, crc = %d, payload = %s)".format(String.valueOf(magic()), attributes(), checksum(), payload());
+        return  String.format("message(magic = %d, attributes = %d, crc = %d, payload = %s)",magic(), attributes(), checksum(), payload());
     }
     @Override
     public boolean equals(Object obj) {

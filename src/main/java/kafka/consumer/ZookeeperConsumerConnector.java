@@ -86,7 +86,7 @@ public class ZookeeperConsumerConnector implements ConsumerConnector{
             consumerUuid = config.consumerId;
         }else{
             UUID uuid = UUID.randomUUID();
-            consumerUuid = "%s-%d-%s".format(
+            consumerUuid = String.format("%s-%d-%s",
                     InetAddress.getLocalHost().getHostName(), System.currentTimeMillis(),
                     Long.toHexString(uuid.getMostSignificantBits()).substring(0,8));
         }
@@ -810,7 +810,7 @@ public class ZookeeperConsumerConnector implements ConsumerConnector{
                 if(!wildcardTopics.contains(addedTopic)) addedTopics.add(addedTopic);
             }
             if (!addedTopics.isEmpty())
-                logger.info("Topic event: added topics = %s".format(addedTopics.toString()));
+                logger.info(String.format("Topic event: added topics = %s",addedTopics.toString()));
             /*
              * TODO: Deleted topics are interesting (and will not be a concern until
              * 0.8 release). We may need to remove these topics from the rebalance
@@ -821,11 +821,11 @@ public class ZookeeperConsumerConnector implements ConsumerConnector{
                 if(!updatedTopics.contains(deletedTopic)) deletedTopics.add(deletedTopic);
             }
             if (!deletedTopics.isEmpty())
-                logger.info("Topic event: deleted topics = %s"
-                        .format(deletedTopics.toString()));
+                logger.info(String
+                        .format("Topic event: deleted topics = %s",deletedTopics.toString()));
 
             wildcardTopics = updatedTopics;
-            logger.info("Topics to consume = %s".format(wildcardTopics.toString()));
+            logger.info(String.format("Topics to consume = %s",wildcardTopics.toString()));
 
             if (!addedTopics.isEmpty() || !deletedTopics.isEmpty()) {
                 try{

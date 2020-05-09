@@ -94,7 +94,7 @@ public class AsyncProducer<T> {
                 }
             }
             catch (InterruptedException e){
-                String msg = "%s interrupted during enqueue of event %s.".format(
+                String msg = String.format("%s interrupted during enqueue of event %s.",
                         getClass().getSimpleName(), event.toString());
                 logger.error(msg);
                 throw new AsyncProducerInterruptedException(msg);

@@ -247,10 +247,10 @@ public class SocketServer {
                                 else
                                     throw new IllegalStateException("Unrecognized key state for processor thread.");
                             } catch (EOFException e){
-                                logger.info("Closing socket connection to %s.".format(channelFor(key).socket().getInetAddress().toString()));
+                                logger.info(String.format("Closing socket connection to %s.",channelFor(key).socket().getInetAddress().toString()));
                                 close(key);
                             }catch (InvalidRequestException e){
-                                logger.info("Closing socket connection to %s due to invalid request: %s".format(channelFor(key).socket().getInetAddress().toString(), e.getMessage()));
+                                logger.info(String.format("Closing socket connection to %s due to invalid request: %s",channelFor(key).socket().getInetAddress().toString(), e.getMessage()));
                                 close(key);
                             }catch (Throwable e){
                                 logger.error("Closing socket for " + channelFor(key).socket().getInetAddress() + " because of error", e);

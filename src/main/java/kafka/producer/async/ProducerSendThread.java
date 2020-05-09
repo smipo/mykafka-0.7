@@ -59,7 +59,7 @@ public class ProducerSendThread<T> extends Thread{
 
             // handle remaining events
             if(remainingEvents.length > 0) {
-                logger.debug("Dispatching last batch of %d events to the event handler".format(remainingEvents.length + ""));
+                logger.debug(String.format("Dispatching last batch of %d events to the event handler",remainingEvents.length));
                 tryToHandle(remainingEvents);
             }
         }catch (Exception e){
@@ -78,8 +78,8 @@ public class ProducerSendThread<T> extends Thread{
             long elapsed = System.currentTimeMillis() - lastSend;
             boolean expired = item == null;
             if(item != null)
-                logger.trace("Dequeued item for topic %s and partition %d"
-                        .format(item.getTopic(), item.getPartition()));
+                logger.trace(String
+                        .format("Dequeued item for topic %s and partition %d",item.getTopic(), item.getPartition()));
             // handle the dequeued current item
             if(cbkHandler != null)
                 events.addAll(cbkHandler.afterDequeuingExistingData(item));

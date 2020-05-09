@@ -55,12 +55,12 @@ public class DefaultEventHandler<T> implements  EventHandler<T>{
                 attemptsRemaining -= 1;
                 try {
                     syncProducer.multiSend(requests);
-                    logger.trace("kafka producer sent messages for topics %s to broker %s:%d (on attempt %d)"
-                            .format(messagesPerTopic + "", syncProducer.config().host, syncProducer.config().port, maxAttempts - attemptsRemaining));
+                    logger.trace(String
+                            .format("kafka producer sent messages for topics %s to broker %s:%d (on attempt %d)",messagesPerTopic.toString(), syncProducer.config().host, syncProducer.config().port, maxAttempts - attemptsRemaining));
                     sent = true;
                 }
                 catch (Exception e){
-                    logger.warn("Error sending messages, %d attempts remaining".format(String.valueOf(attemptsRemaining)), e);
+                    logger.warn(String.format("Error sending messages, %d attempts remaining",attemptsRemaining), e);
                     if (attemptsRemaining == 0)
                         throw e;
                 }
@@ -84,17 +84,17 @@ public class DefaultEventHandler<T> implements  EventHandler<T>{
             Pair<String,Integer> p = entry.getKey();
             Message message = serializer.toMessage(entry.getValue());
             if(config.compressionCodec instanceof NoCompressionCodec){
-                logger.trace("Sending %d messages with no compression to topic %s on partition %d"
-                        .format(message.size() + "", p.getKey(), p.getValue()));
+                logger.trace(String
+                        .format("Sending %d messages with no compression to topic %s on partition %d",message.size(), p.getKey(), p.getValue()));
                 messagesPerTopicPartition.put(p,new ByteBufferMessageSet(new NoCompressionCodec(), message));
             }else{
                 if(config.compressedTopics.size() == 0 || config.compressedTopics.contains(p.getKey())){
-                    logger.trace("Sending %d messages with compression codec %d to topic %s on partition %d"
-                            .format(message.size() + "", config.compressionCodec.codec(), p.getKey(), p.getValue()));
+                    logger.trace(String
+                            .format("Sending %d messages with compression codec %d to topic %s on partition %d",message.size(), config.compressionCodec.codec(), p.getKey(), p.getValue()));
                     messagesPerTopicPartition.put(p,new ByteBufferMessageSet(config.compressionCodec, message));
                 }else{
-                    logger.trace("Sending %d messages to topic %s and partition %d with no compression as %s is not in compressed.topics - %s"
-                            .format(message.size() + "",  p.getKey(), p.getValue(), p.getKey(),
+                    logger.trace(String
+                            .format("Sending %d messages to topic %s and partition %d with no compression as %s is not in compressed.topics - %s",message.size() ,  p.getKey(), p.getValue(), p.getKey(),
                                     config.compressedTopics.toString()));
                     messagesPerTopicPartition.put(p,new ByteBufferMessageSet(new NoCompressionCodec(), message));
                 }

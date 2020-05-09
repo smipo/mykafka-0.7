@@ -18,7 +18,7 @@ public class Blacklist  extends TopicFilter{
         boolean allowed = topic.matches(regex);
         String input = "filtered";
         if (allowed) input = "allowed";
-        logger.debug("%s %s".format(
+        logger.debug(String.format("%s %s",
                 topic,input ));
 
         return allowed;

@@ -153,13 +153,13 @@ public class ByteBufferMessageSet extends MessageSet {
                 }
                 else{
                     if(newMessage.compressionCodec() instanceof NoCompressionCodec){
-                        logger.debug("Message is uncompressed. Valid byte count = %d".format(String.valueOf(currValidBytes)));
+                        logger.debug(String.format("Message is uncompressed. Valid byte count = %d",currValidBytes));
                         innerIter = null;
                         currValidBytes += 4 + size;
                         logger.trace("currValidBytes = " + currValidBytes);
                         return new MessageAndOffset(newMessage, currValidBytes);
                     }else{
-                        logger.debug("Message is compressed. Valid byte count = %d".format(String.valueOf(currValidBytes)));
+                        logger.debug(String.format("Message is compressed. Valid byte count = %d",currValidBytes));
                         try {
                             innerIter = CompressionFactory.decompress(newMessage).internalIterator(false);
                         }catch (IOException e){

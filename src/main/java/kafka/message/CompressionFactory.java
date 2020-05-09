@@ -20,7 +20,7 @@ public class CompressionFactory {
             case 2:
                 return new SnappyCompressionCodec();
             default:
-                throw new kafka.common.UnknownCodecException("%d is an unknown compression codec".format(String.valueOf(codec)));
+                throw new kafka.common.UnknownCodecException(String.format("%d is an unknown compression codec",codec));
         }
     }
 
